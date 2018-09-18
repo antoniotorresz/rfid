@@ -1,0 +1,20 @@
+﻿-- Base de datos de Prueba para el taller
+-- Tópicos selectos de programación
+
+DROP DATABASE IF EXISTS topicos;
+
+CREATE DATABASE topicos;
+
+USE topicos;
+
+--  Esta tabla guarda los datos de prueba de alumnos
+CREATE TABLE alumno
+(
+    matricula           VARCHAR(10) NOT NULL PRIMARY KEY,
+    nombre              VARCHAR(20) NOT NULL DEFAULT '',
+    apellidoPaterno     VARCHAR(20) NOT NULL DEFAULT '',
+    apellidoMaterno     VARCHAR(20) NOT NULL DEFAULT '',
+    edad		 INT NOT NULL,
+    telefono            VARCHAR(25) NOT NULL DEFAULT ''
+   
+);
