@@ -6,10 +6,12 @@
 package SI403_CBarras;
 import SI403_BDatos.ConexionMySQL;
 import SI403_CQR.QR;
+import com.fazecast.jSerialComm.SerialPort;
 import java.sql.*;
 import java.awt.event.KeyEvent;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -23,30 +25,59 @@ public class TestCBarras3 extends javax.swing.JFrame {
     Image foto;
     Statement t;
     ResultSet r;
+    SerialPort puertoSerial;  //nuevo
+    int caracteres = 32;   // nuevo
+    OutputStream Output = null; //nuevo
+    String m = null; //nuevo
 
     
     public TestCBarras3() {
         initComponents();
         c= new ConexionMySQL();
         inicializarControles();
+        conectarPuerto();
+    }
+    
+    public void conectarPuerto(){
+        try {
+            puertoSerial = SerialPort.getCommPort("COM7");
+            puertoSerial.setBaudRate(9600);
+            puertoSerial.setNumDataBits(8);
+            puertoSerial.setNumStopBits(1);
+            puertoSerial.setParity(0);
+                // Abrimos la conexion con el puerto serial
+           puertoSerial.openPort();
+           Output = puertoSerial.getOutputStream();
+//           this.jLabel5.setText("Conexion con arduino exitosa");
+        } catch (Exception e) {
+//            this.jLabel5.setText("Conexion con arduino erronea :(");
+        }
     }
     
     public void buscar(String m) throws SQLException, Exception{
         t = c.abrir().createStatement();
         r = t.executeQuery("SELECT * FROM alumno WHERE matricula ='" + m + "'");
         r.first();
-        this.jTextField2.setText(r.getString(1));
-        this.jTextField3.setText(r.getString(2));
-        this.jTextField4.setText(r.getString(3));
-        this.jTextField5.setText(r.getString(4));
-        this.jTextField6.setText(r.getString(5));
-        this.jTextField7.setText(r.getString(6));
-        foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".png");
-        this.jLabel5.setIcon(new ImageIcon(foto.getScaledInstance(200, 100, 0)));
-        foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(2) + ".jpg");
-        this.jLabel6.setIcon(new ImageIcon(foto.getScaledInstance(200, 100, 0)));
-        foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".gif");
-        this.jLabel14.setIcon(new ImageIcon(foto.getScaledInstance(100, 100, 0)));
+        if (r.absolute(1)) {
+            this.jTextField2.setText(r.getString(1));
+            this.jTextField3.setText(r.getString(2));
+            this.jTextField4.setText(r.getString(3));
+            this.jTextField5.setText(r.getString(4));
+            this.jTextField6.setText(r.getString(5));
+            this.jTextField7.setText(r.getString(6));
+            foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".png");
+            this.jLabel5.setIcon(new ImageIcon(foto.getScaledInstance(200, 100, 0)));
+            foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(2) + ".jpg");
+            this.jLabel6.setIcon(new ImageIcon(foto.getScaledInstance(200, 100, 0)));
+            foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".gif");
+            this.jLabel14.setIcon(new ImageIcon(foto.getScaledInstance(100, 100, 0)));
+            enviarOn();
+            enviarDatos(m);
+        } else {
+            System.out.println("no existen coincidencias");
+            enviarOff();
+            enviarDatos("ERROR..");
+        }
     }
     
     public void inicializarControles(){
@@ -55,6 +86,31 @@ public class TestCBarras3 extends javax.swing.JFrame {
     this.jLabel6.setText(null);
     this.jLabel14.setText(null);
     this.jTextField1.requestFocus();
+    }
+    
+    private void enviarDatos(String data){
+        try {
+            Output.write(data.getBytes());
+        } catch (Exception e) {
+            System.exit(ERROR);
+        }
+    }
+    
+    
+    public void enviarOn(){
+        String dato = null;
+        byte[] bytes = null;
+        dato = "" + 1;
+        bytes = dato.getBytes();
+        puertoSerial.writeBytes(bytes, bytes.length);
+    }
+    
+     public void enviarOff(){
+        String dato = null;
+        byte[] bytes = null;
+        dato = "" + 0;
+        bytes = dato.getBytes();
+        puertoSerial.writeBytes(bytes, bytes.length);
     }
 
     /**
