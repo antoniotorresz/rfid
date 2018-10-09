@@ -40,7 +40,7 @@ public class TestCBarras3 extends javax.swing.JFrame {
     
     public void conectarPuerto(){
         try {
-            puertoSerial = SerialPort.getCommPort("COM7");
+            puertoSerial = SerialPort.getCommPort("COM3");
             puertoSerial.setBaudRate(9600);
             puertoSerial.setNumDataBits(8);
             puertoSerial.setNumStopBits(1);
@@ -72,7 +72,8 @@ public class TestCBarras3 extends javax.swing.JFrame {
             foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".gif");
             this.jLabel14.setIcon(new ImageIcon(foto.getScaledInstance(100, 100, 0)));
             enviarOn();
-            enviarDatos(m);
+            enviarDatos(jTextField3.getText() + " " +jTextField4.getText() + " " + jTextField5.getText());
+//            enviarDatos(m);
         } else {
             System.out.println("no existen coincidencias");
             enviarOff();
@@ -92,7 +93,8 @@ public class TestCBarras3 extends javax.swing.JFrame {
         try {
             Output.write(data.getBytes());
         } catch (Exception e) {
-            System.exit(ERROR);
+            e.printStackTrace();
+//            System.exit(ERROR);
         }
     }
     
@@ -100,7 +102,7 @@ public class TestCBarras3 extends javax.swing.JFrame {
     public void enviarOn(){
         String dato = null;
         byte[] bytes = null;
-        dato = "" + 1;
+        dato = ""  + 1;
         bytes = dato.getBytes();
         puertoSerial.writeBytes(bytes, bytes.length);
     }
