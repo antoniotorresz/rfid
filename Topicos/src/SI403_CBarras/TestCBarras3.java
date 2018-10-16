@@ -426,8 +426,10 @@ public class TestCBarras3 extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1KeyPressed
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        System.out.println("holadssssss");
         try {
             this.recibeDeArduino();
+            this.jTextField1.setText((cadena.substring(cadena.length()-20, cadena.length())).trim());
         } catch (IOException ex) {
             Logger.getLogger(TestCBarras3.class.getName()).log(Level.SEVERE, null, ex);
         }
