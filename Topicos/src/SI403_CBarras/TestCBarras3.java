@@ -11,7 +11,9 @@ import java.sql.*;
 import java.awt.event.KeyEvent;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -28,7 +30,9 @@ public class TestCBarras3 extends javax.swing.JFrame {
     SerialPort puertoSerial;  //nuevo
     int caracteres = 32;   // nuevo
     OutputStream Output = null; //nuevo
+    InputStream Input = null;
     String m = null; //nuevo
+    String cadena = "";
 
     
     public TestCBarras3() {
@@ -48,6 +52,7 @@ public class TestCBarras3 extends javax.swing.JFrame {
                 // Abrimos la conexion con el puerto serial
            puertoSerial.openPort();
            Output = puertoSerial.getOutputStream();
+           Input = puertoSerial.getInputStream();
 //           this.jLabel5.setText("Conexion con arduino exitosa");
         } catch (Exception e) {
 //            this.jLabel5.setText("Conexion con arduino erronea :(");
@@ -71,14 +76,21 @@ public class TestCBarras3 extends javax.swing.JFrame {
             this.jLabel6.setIcon(new ImageIcon(foto.getScaledInstance(200, 100, 0)));
             foto = Toolkit.getDefaultToolkit().getImage("./src/SI403_CBarras/" + r.getString(1) + ".gif");
             this.jLabel14.setIcon(new ImageIcon(foto.getScaledInstance(100, 100, 0)));
-            enviarOn();
-            enviarDatos(jTextField3.getText() + " " +jTextField4.getText() + " " + jTextField5.getText());
+            //enviarOn();
+            //enviarDatos(jTextField3.getText() + " " +jTextField4.getText() + " " + jTextField5.getText());
 //            enviarDatos(m);
         } else {
             System.out.println("no existen coincidencias");
-            enviarOff();
-            enviarDatos("ERROR..");
+            //enviarOff();
+            //enviarDatos("ERROR..");
         }
+    }
+    
+    public void recibeDeArduino() throws IOException{  // para recibir los caracteres de arduino
+        while(Input.available()>0){                                     //      y convertirlos a cadena
+            cadena+=String.valueOf((char) (Input.read()));
+        }
+        System.out.println(cadena);
     }
     
     public void inicializarControles(){
@@ -148,6 +160,7 @@ public class TestCBarras3 extends javax.swing.JFrame {
         jTextField7 = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -290,6 +303,13 @@ public class TestCBarras3 extends javax.swing.JFrame {
         jLabel14.setText("jLabel14");
         jLabel14.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0), 5));
 
+        jButton2.setText("OK");
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -304,7 +324,8 @@ public class TestCBarras3 extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jButton1)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(44, 44, 44)
@@ -341,6 +362,8 @@ public class TestCBarras3 extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2)
+                                .addGap(9, 9, 9)
                                 .addComponent(jButton1))
                             .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -402,6 +425,14 @@ public class TestCBarras3 extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTextField1KeyPressed
 
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        try {
+            this.recibeDeArduino();
+        } catch (IOException ex) {
+            Logger.getLogger(TestCBarras3.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton2MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -439,6 +470,7 @@ public class TestCBarras3 extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
